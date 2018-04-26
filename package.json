@@ -4,7 +4,8 @@
   "description": "ITC 230 Application",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon -e html,css,js --watch . --watch views index.js"
   },
   "repository": {
     "type": "git",
@@ -15,5 +16,10 @@
   "bugs": {
     "url": "https://github.com/hannahclee/adv-javaScript/issues"
   },
-  "homepage": "https://github.com/hannahclee/adv-javaScript#readme"
+  "homepage": "https://github.com/hannahclee/adv-javaScript#readme",
+  "dependencies": {
+    "express": "^4.16.3",
+    "express-handlebars": "^3.0.0",
+    "nodemon": "^1.17.3"
+  }
 }
