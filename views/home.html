@@ -5,17 +5,32 @@
     </head>
     <body>
         <h2>Albums</h2>
+        <h3>Find Album</h3>
         <form method="POST" action="/detail">
            Enter Album Title:
             <input name="album" type="text">
             <br/>
            <input type="submit" value="Search"> 
+            
         </form>
-        <br/>
-            <li><a href ="/detail?album=B">Blue</a></li>
-            <li><a href ="/detail?album=Lemonade">Lemonade</a></li>
-            <li><a href ="/detail?album=Aqualung">Aqualung</a></li>
-            <li><a href ="/detail?album=Artpop">Artpop</a></li>
-            <li><a href ="/detail?album=Help">Help</a></li>
+        <h3>Add an Album</h3>
+        <form method="POST" action="/add">
+            <input name="title" type="text" placeholder="Title">
+            <br>
+            <input name="artist" type="text" placeholder="Artist">
+            <br>
+            <input name="year" type="text" placeholder="Year">
+            <br>
+            <input type="submit" value="Add">
+
+        </form>
+        <h2>Current Albums</h2>
+        <td>
+            <ul>
+              {{#each albumList}}
+                <li>Album Title: {{title}}<br>Artist: {{artist}}<br>Year: {{year}}</li>
+              {{/each}}
+            </ul>
+          </td>
     </body>
 </html>

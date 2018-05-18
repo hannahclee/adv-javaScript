@@ -4,14 +4,10 @@
   "description": "ITC 230 Application",
   "main": "index.js",
   "scripts": {
-<<<<<<< HEAD
     "dev": "nodemon -e html,css,js --watch . --watch views index.js",
     "lint": "eslint **/*.js",
     "test": "mocha test/**"
-=======
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon -e html,css,js --watch . --watch views index.js"
->>>>>>> 797260cd80526855f8f29e76ea7ae711b99ff899
+
   },
   "repository": {
     "type": "git",
@@ -26,8 +22,6 @@
   "dependencies": {
     "express": "^4.16.3",
     "express-handlebars": "^3.0.0",
-<<<<<<< HEAD
-    "mongodb": "^3.0.7",
     "mongoose": "^5.0.17",
     "nodemon": "^1.17.3"
   },
@@ -35,8 +29,5 @@
     "chai": "^4.1.2",
     "eslint": "^4.19.1",
     "mocha": "^5.1.1"
-=======
-    "nodemon": "^1.17.3"
->>>>>>> 797260cd80526855f8f29e76ea7ae711b99ff899
-  }
+ }
 }

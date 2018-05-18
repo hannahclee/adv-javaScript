@@ -2,6 +2,8 @@
 const express = require("express");
 const app = express();
 const albums = require("./albums.js");
+const Album = require('./models/Album.js');
+
 app.set('port', /*process.env.PORT || */ 3000);
 app.use(express.static(__dirname + '/public')); //set location for static files
 app.use(require("body-parser").urlencoded({ extended: true })); //parse form submissions
@@ -12,9 +14,13 @@ app.set("view engine", "html");
 
 //send static file as response
 app.get('/', (req, res) => {
-    res.type('text/html');
-    res.render('home', { albums: albums.getAllAlbums() });
+    Album.find({}, function (err, albums) {
+        if (err) return next(err);
+        res.type('text/html');
+        res.render('home', { albumList: albums });
+      });
 });
+
 
 //send plain text response
 app.get('/about', (req, res) => {
@@ -24,32 +30,58 @@ app.get('/about', (req, res) => {
 
 //GET handler
 app.get('/delete', (req, res) => {
-    let result = albums.deleteAlbum(req.query.album);
-    let message = "deleted"
-    if(!result){
-        message = "not deleted"
-    };
-    res.render('delete', { 
-        title: req.query.album, 
-        message: message });
+    Album.findOne({title: req.query.album}, (err, album) =>{
+        if(err) return next(err);
+        res.type('text/html');
+        if(album !== null){
+            Album.deleteOne({title: req.query.album}, (err) =>{
+                let message = "deleted";
+                if(err) {
+                    message = "not deleted"
+                };
+                res.type('text/html');
+                res.render('delete', {title: req.query.album, message: message});
+            });
+        }
+        
+        else {
+            res.render('delete', {title: req.query.album, message: "not in database"});
+        }
+    }
+    );
+            
+
 });
 
 app.get('/detail', (req, res) => {
-    console.log(req.query)
-    var found = albums.getAlbum(req.query.album);
-    res.render("detail", { title: req.query.album, 
-        result: found, 
-     });
+    Album.findOne({title: req.query.album.toLowerCase()}, (err, album) =>{
+        if(err) return next(err);
+        res.type('text/html');
+        res.render('detail', {result: album, title: req.query.album});
+    });
 });
 
 //POST handler
 app.post('/detail', (req, res) => {
-    let found = albums.getAlbum(req.body.album);
-    res.render("detail",
-        {
-            title: req.body.album,
-            result: found
-        });
+    Album.findOne({title: req.body.album}, (err, album) =>{
+        if(err) return next(err);
+        res.type('text/html');
+        res.render('detail', {result: album, title: req.body.album});
+    });
+});
+
+app.post('/add', (req, res) => {
+    let obj = {
+        title: req.body.title,
+        artist: req.body.artist,
+        year: req.body.year
+    };
+    Album.create(obj, (err, albums) =>{
+        if(err) return next(err);
+        res.type('text/html');
+        res.render('add', {result: albums, title: req.query.album});
+    });
+
 });
 
 //define 404 handler
