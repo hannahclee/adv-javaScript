@@ -70,13 +70,14 @@ app.get('/api/album/:title', (req, res) => {
 //     });
 // });
 
-app.post('/api/album/add/:title/:artist/:year', (req, res) => {
+
+//API ADD ROUTE
+app.get('/api/album/add/:title/:artist/:year', (req, res) => {
     let obj = {
         title: req.params.title,
         artist: req.params.artist,
         year: req.params.year
     };
-    console.log(req.params.title)
     Album.create(obj, (err, album) =>{
         if(err) return (err);
         res.json(album);
