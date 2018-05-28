@@ -13,39 +13,39 @@ app.engine("html", handlebars({ extname: 'html' }));
 app.set("view engine", "html");
 
 //send static file as response
-app.get('/', (req, res) => {
+
+//API route GET ALL ALBUMS
+app.get('/api/albums', (req, res) => {
     Album.find({}, function (err, albums) {
-        if (err) return next(err);
-        res.type('text/html');
-        res.render('home', { albumList: albums });
+        if (err) return (err);
+        res.json(albums.map((results)=>{
+            return{
+                title: results.title,
+                artist: results.artist,
+                year: results.year
+            }
+        }));
       });
 });
 
+//GET handlers
 
-//send plain text response
-app.get('/about', (req, res) => {
-    res.type('text/html');
-    res.send('About Page');
-});
-
-//GET handler
-app.get('/delete', (req, res) => {
-    Album.findOne({title: req.query.album}, (err, album) =>{
+//API route DELETE ALBUM
+app.get('/api/delete/:title', (req, res) => {
+    Album.findOne({title: req.params.title}, (err, album) =>{
         if(err) return next(err);
-        res.type('text/html');
         if(album !== null){
-            Album.deleteOne({title: req.query.album}, (err) =>{
+            Album.deleteOne({title: req.params.title}, (err) =>{
                 let message = "deleted";
                 if(err) {
                     message = "not deleted"
                 };
-                res.type('text/html');
-                res.render('delete', {title: req.query.album, message: message});
+                res.json(album + message);
             });
         }
         
         else {
-            res.render('delete', {title: req.query.album, message: "not in database"});
+            res.json(album + "not in database");
         }
     }
     );
@@ -53,33 +53,33 @@ app.get('/delete', (req, res) => {
 
 });
 
-app.get('/detail', (req, res) => {
-    Album.findOne({title: req.query.album.toLowerCase()}, (err, album) =>{
-        if(err) return next(err);
-        res.type('text/html');
-        res.render('detail', {result: album, title: req.query.album});
+//API route GET ONE ALBUM
+app.get('/api/album/:title', (req, res) => {
+    Album.findOne({title: req.params.title}, (err, album) =>{
+        if(err) return (err);
+        res.json(album);
     });
 });
 
 //POST handler
-app.post('/detail', (req, res) => {
-    Album.findOne({title: req.body.album}, (err, album) =>{
-        if(err) return next(err);
-        res.type('text/html');
-        res.render('detail', {result: album, title: req.body.album});
-    });
-});
+// app.post('/detail', (req, res) => {
+//     Album.findOne({title: req.body.album}, (err, album) =>{
+//         if(err) return next(err);
+//         res.type('text/html');
+//         res.render('detail', {result: album, title: req.body.album});
+//     });
+// });
 
-app.post('/add', (req, res) => {
+app.post('/api/album/add/:title/:artist/:year', (req, res) => {
     let obj = {
-        title: req.body.title,
-        artist: req.body.artist,
-        year: req.body.year
+        title: req.params.title,
+        artist: req.params.artist,
+        year: req.params.year
     };
-    Album.create(obj, (err, albums) =>{
-        if(err) return next(err);
-        res.type('text/html');
-        res.render('add', {result: albums, title: req.query.album});
+    console.log(req.params.title)
+    Album.create(obj, (err, album) =>{
+        if(err) return (err);
+        res.json(album);
     });
 
 });
