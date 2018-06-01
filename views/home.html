@@ -1,36 +1,128 @@
-<!DOCTYPE html>
 <html>
-    <head>
-        <title>Albums</title>
-    </head>
-    <body>
-        <h2>Albums</h2>
-        <h3>Find Album</h3>
-        <form method="POST" action="/detail">
-           Enter Album Title:
-            <input name="album" type="text">
-            <br/>
-           <input type="submit" value="Search"> 
-            
-        </form>
-        <h3>Add an Album</h3>
-        <form method="POST" action="/add">
-            <input name="title" type="text" placeholder="Title">
-            <br>
-            <input name="artist" type="text" placeholder="Artist">
-            <br>
-            <input name="year" type="text" placeholder="Year">
-            <br>
-            <input type="submit" value="Add">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Record Store</title>
 
-        </form>
-        <h2>Current Albums</h2>
-        <td>
-            <ul>
-              {{#each albumList}}
-                <li>Album Title: {{title}}<br>Artist: {{artist}}<br>Year: {{year}}</li>
-              {{/each}}
-            </ul>
-          </td>
-    </body>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.6.2/react.min.js"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/15.6.1/react-dom.min.js"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.25.0/babel.min.js"></script>
+
+ <style type="text/css">
+
+ body{
+   font-family: Avenir, Cochin, Georgia, Times, 'Times New Roman', serif;
+ }
+ .flex-container {
+      display: -webkit-flex;
+      display: flex;
+      width: 600px;
+      background-color: lightgrey;
+      margin: 0 auto;
+  }
+
+  .title{
+    margin: 0 auto;
+    text-align: center;
+    width: 600px;
+    font-size: 2em;
+
+  }
+
+  #item-list {
+      background-color: white;
+      width: 30%;
+      padding: 0px 10px 0px 10px;
+      border: solid black 1px;
+  }
+  #item-details {
+      background-color: white;
+      width: 75%;
+      padding: 10px;
+      border: solid black 1px;
+  }
+</style>
+
+</head>
+<body>
+
+  <div id="root"></div>
+
+<!-- NOTE: script type declaration to support JSX -->
+<script type="text/babel">
+
+    class MyApp extends React.Component {
+      constructor(props){
+        super(props);
+        // data from server 
+        this.state = {
+          items: {{{albums}}},
+          curItem: {}
+        };
+      }
+            // show item details when list item clicked
+            showDetails(event){
+        // event.target is item clicked. Assumes each item has an id attribute
+        let editItem = this.state.items.find((item) => {
+          return item._id == event.target.id;
+        });
+        this.setState({curItem: editItem});
+      }
+      
+      render() {
+        return (
+          <div>
+            <div className="title">
+          <Title title="Record Store"/>
+          </div>
+          <div className="flex-container">
+            <ItemList
+                items={this.state.items} 
+                show={this.showDetails.bind(this)}
+            />
+            <ItemDetails item={this.state.curItem}/>
+            </div>
+          </div>
+        );
+      }
+          
+    }
+
+        const Title = ({title}) => {
+        return (
+           <div><h2>{title}</h2></div>
+        );
+    }
+
+        const ItemList = ({items, filter, show}) => {
+      // return items that match search entry field, or all items if no entry
+      const itemNodes = items.map((item) => {
+        if (!filter || item.title.toLowerCase().includes(filter)) { 
+          return <li id={item._id} key={item._id} onClick={show}>{item.title}</li>
+        }
+      });
+      return <span id="item-list">
+          <h3>Current Albums</h3>
+        <ul>{itemNodes}</ul>
+        </span>;
+    }
+
+        const ItemDetails = (props) => {
+        return (
+          <span id="item-details">
+            <h3>Details:</h3>
+            <form onChange={props.change}>
+              <input type="text" name="title" placeholder="Title" value={props.item.title || ""} /><p/>
+              <input type="text" name="arist" placeholder="Artist" value={props.item.artist || ""} /><p/>
+              <input type="text" name="year" placeholder="Year" value={props.item.year} />
+              <p/>
+            </form>
+          </span>
+        );
+    }
+    
+    ReactDOM.render(<MyApp />, document.getElementById('root'));
+</script>  
+
+</body>
 </html>
