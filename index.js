@@ -13,6 +13,18 @@ app.engine("html", handlebars({ extname: 'html' }));
 app.set("view engine", "html");
 
 //send static file as response
+app.get('/', (req, res) => {
+         Album.find({}, function (err, albums) {
+            if (err) return (err);
+            res.render('home', {albums: JSON.stringify(albums)}); 
+        });
+    });
+
+//send plain text response
+app.get('/about', (req, res) => {
+       res.type('text/html');
+        res.send('About Page');
+    });
 
 //API route GET ALL ALBUMS
 app.get('/api/albums', (req, res) => {
