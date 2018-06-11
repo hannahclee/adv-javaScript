@@ -3,10 +3,12 @@ const express = require("express");
 const app = express();
 const albums = require("./albums.js");
 const Album = require('./models/Album.js');
+let bodyParser = require("body-parser");
 
 app.set('port', /*process.env.PORT || */ 3000);
 app.use(express.static(__dirname + '/public')); //set location for static files
 app.use(require("body-parser").urlencoded({ extended: true })); //parse form submissions
+app.use(bodyParser.json());
 
 let handlebars = require("express-handlebars");
 app.engine("html", handlebars({ extname: 'html' }));
@@ -73,29 +75,26 @@ app.get('/api/album/:title', (req, res) => {
     });
 });
 
-//POST handler
-// app.post('/detail', (req, res) => {
-//     Album.findOne({title: req.body.album}, (err, album) =>{
-//         if(err) return next(err);
-//         res.type('text/html');
-//         res.render('detail', {result: album, title: req.body.album});
-//     });
-// });
 
 
 //API ADD ROUTE
-app.get('/api/album/add/:title/:artist/:year', (req, res) => {
-    let obj = {
-        title: req.params.title,
-        artist: req.params.artist,
-        year: req.params.year
-    };
-    Album.create(obj, (err, album) =>{
-        if(err) return (err);
-        res.json(album);
-    });
-
+app.post('/api/album/add/', (req,res, next) => {
+    // find & update existing item, or add new 
+    if (!req.body._id) { // insert new document
+        let album = new Album({title:req.body.title,artist:req.body.artist,year:req.body.year});
+        album.save((err,newAlbum) => {
+            if (err) return next(err);
+            console.log(newAlbum)
+            res.json({updated: 0, _id: newAlbum._id});
+        });
+    } else { // update existing document
+        Album.updateOne({ _id: req.body._id}, {title:req.body.title, artist: req.body.artist, year: req.body.year }, (err, result) => {
+            if (err) return next(err);
+            res.json({updated: result.nModified, _id: req.body._id});
+        });
+    }
 });
+
 
 //define 404 handler
 app.use((req, res) => {
@@ -110,46 +109,3 @@ app.listen(app.get('port'), () => {
 });
 
 
-
-/*var http = require("http"); 
-
-http.createServer(function(req,res) {
-  var parts = req.url.toLowerCase().split('?');
-  var path = parts[0];
-if (!path.startsWith('/favicon')){ 
-  var query = parts[1];
-  
-  switch(path) {
-    case '/':
-      res.writeHead(200, {'Content-Type': 'text/plain'});
-      res.write('Our Albums: ' + JSON.stringify(albums.getAllAlbums()));
-      res.end('');
-      break;
-          
-    case '/about':
-      res.writeHead(200, {'Content-Type': 'text/plain'});
-      res.end('About page');
-      break;    
-      
-    case '/get':
-      var value = query.split('=')[1];
-      res.writeHead(200, {'Content-Type': 'text/plain'});
-      res.write(JSON.stringify(albums.getAlbum(value)));
-      res.end('');
-      break;    
-      
-    case '/delete':
-        var value = query.split('=')[1];
-      res.writeHead(200, {'Content-Type': 'text/plain'});
-      res.write(JSON.stringify(albums.deleteAlbum(value)));
-      res.end('');
-      break;
-          
-    default:
-      res.writeHead(404, {'Content-Type': 'text/plain'});
-      res.end('Not found');
-      break;
-    }
-}
-}).listen(process.env.PORT || 3000);
-*/
